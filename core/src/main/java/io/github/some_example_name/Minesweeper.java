@@ -29,7 +29,7 @@ public class Minesweeper extends Game {
         batch = new SpriteBatch();
         // use libGDX's default font
         FreeTypeFontGenerator generator =
-            new FreeTypeFontGenerator(Gdx.files.internal("C:\\Minesweeper\\assets\\Roboto\\Roboto-VariableFont_wdth,wght.ttf"));
+            new FreeTypeFontGenerator(Gdx.files.internal("Roboto-VariableFont_wdth,wght.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
         param.size = 32;
         param.color = Color.WHITE;

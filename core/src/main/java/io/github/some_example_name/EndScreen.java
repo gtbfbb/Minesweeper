@@ -35,7 +35,7 @@ public class EndScreen implements Screen{
     @Override
     public void show() {
         stage = new Stage(new ScreenViewport());
-        skin = new Skin(Gdx.files.internal("C:\\Minesweeper\\assets\\glassy-ui.json"));
+        skin = new Skin(Gdx.files.internal("glassy-ui.json"));
 
         Gdx.input.setInputProcessor(stage);
 
