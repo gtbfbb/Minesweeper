@@ -3,17 +3,16 @@ package io.github.some_example_name;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -43,10 +42,25 @@ public class StartScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         skin = new Skin(Gdx.files.internal("glassy-ui.json"));
 
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-VariableFont_wdth,wght.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 50;
+        BitmapFont font32 = generator.generateFont(parameter);
+        String startText = "Welcome to Minesweeper";
+
+        Label.LabelStyle style = new Label.LabelStyle(font32, Color.WHITE);
+        Label text = new Label(startText, style);
+
+
         Gdx.input.setInputProcessor(stage);
 
         Table table = new Table();
         table.setFillParent(true);
+
+        table.add(text).padBottom(25);
+        generator.dispose();
+        table.row();
+
         stage.addActor(table);
         selectBox = new SelectBox<>(skin);
 
@@ -61,6 +75,7 @@ public class StartScreen implements Screen {
                 Main.difficulty = difficulty;
             }
         });
+
 
 
         TextButton myButton = new TextButton("Begin!", skin);
@@ -91,7 +106,8 @@ public class StartScreen implements Screen {
         selectBox.setAlignment(Align.center);
         selectBox.getList().setAlignment(Align.center);
 
-        table.add(myButton).size(myButton.getPrefWidth(), myButton.getPrefHeight());
+        table.add(myButton).size(myButton.getPrefWidth(), myButton.getPrefHeight()).padBottom(25);
+        table.row();
 
         table.add(selectBox).width(350).height(50).padLeft(50);
     }

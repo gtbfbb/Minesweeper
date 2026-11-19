@@ -27,20 +27,14 @@ public class Minesweeper extends Game {
 
     public void create() {
         batch = new SpriteBatch();
-        // use libGDX's default font
         FreeTypeFontGenerator generator =
             new FreeTypeFontGenerator(Gdx.files.internal("Roboto-VariableFont_wdth,wght.ttf"));
         FreeTypeFontParameter param = new FreeTypeFontParameter();
         param.size = 32;
         param.color = Color.WHITE;
-
         font = generator.generateFont(param);
         generator.dispose();
-
-//        font = new BitmapFont();
         viewport = new FitViewport(Main.difficulties.get(difficulty)[1], Main.difficulties.get(difficulty)[2]);
-
-        //font has 15pt, but we need to scale it to our viewport by ratio of viewport height to screen height
         font.setUseIntegerPositions(false);
         font.getData().setScale(viewport.getWorldHeight() / Gdx.graphics.getHeight() * 2);
 

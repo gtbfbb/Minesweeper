@@ -37,6 +37,7 @@ public class Main implements Screen {
     private int btncount = 0;
     private int uncoveredTiles = 0;
     private int pressedx, pressedy;
+    private boolean win = false;
 
 
 
@@ -46,7 +47,7 @@ public class Main implements Screen {
         texture = new Texture("MinesweeperTileset.png");
         textures.put("tile", new TextureRegion(texture, 16, 32, 16, 16));
 
-        //set up dictionary for all the textures
+        //set up a dictionary for all the textures
         int ypixels = 0;
         for (int i = 1; i < 10; i++) {
             if ((i - 1) * 16 == 80) {
@@ -91,15 +92,21 @@ public class Main implements Screen {
 
     @Override
     public void render(float delta) {
-        input();
-        logic();
         draw();
+        input();
+
+    }
+
+
+    public boolean game_over_status() {
+        return win;
     }
 
 
     private void end_game() {
         if (uncoveredTiles == grid.length * grid[0].length - mines){
 //            System.out.println("You won");
+            win = true;
             game.setScreen(game.endScreen);
         }
 
@@ -135,13 +142,17 @@ public class Main implements Screen {
                         uncover_tiles(pressedx, pressedy);
                     }
 
+                    batch.begin();
+                    reveal_tiles();
+                    batch.end();
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            end_game();
+                        }
+                    }, .1f);
 
-//                    for (int [] row : uncovered) {
-//                        System.out.println(Arrays.toString(row));
-//                    }
-//                    check_status();
 
-                    end_game();
                 }
 
 
@@ -164,16 +175,6 @@ public class Main implements Screen {
 
 
     private void logic() {
-        if (btncount < 1) {
-            return;
-        }
-
-//        uncover_tiles(pressedx, pressedy);
-//        check_status();
-//        System.out.println(pressedx + "," + pressedy);
-//        System.out.println(uncoveredTiles);
-//        System.out.println(uncoveredTiles);
-
     }
 
     private void draw() {
@@ -196,23 +197,13 @@ public class Main implements Screen {
     }
 
 
-    private void check_status() {
-        uncoveredTiles = 0;
-        for (int i = 0; i < uncovered.length; i++) {
-            for (int j = 0; j < uncovered[i].length; j++) {
-                if (uncovered[i][j] == 0 && grid[i][j] >= 0) {
-                    uncoveredTiles++;
-                }
-            }
-        }
-    }
-
     private void set_mines(int x, int y){
         int count = 0;
         int[] rowOffset = {-1, -1, -1, 0, 0, 0, 1, 1, 1};
         int[] colOffest = {-1, 0, 1, -1, 0, 1, -1, 0, 1};
         int[] clickedAreas = new int[9];
 
+        //the clicked tile and its neighbors should not be covering a mine
         for (int i = 0; i < clickedAreas.length; i++) {
             clickedAreas[i] = (rowOffset[i] + y) * xsize + (x + colOffest[i]);
         }
@@ -247,11 +238,14 @@ public class Main implements Screen {
             int[] rowOffset = {-1, -1, -1, 0, 0, 1, 1, 1};
             int[] colOffest = {-1, 0, 1, -1, 1, -1, 0, 1};
 
+
             for (int j = 0; j < rowOffset.length; j++) {
+                //skip if the tile is off the board's grid
                 if (rowOffset[j] + row > ysize - 1 || rowOffset[j] + row < 0 || colOffest[j] + column > xsize - 1 || colOffest[j] + column < 0) {
                     continue;
                 }
-                grid[rowOffset[j] + row][colOffest[j] + column] -= (grid[rowOffset[j] + row][colOffest[j] + column] != -1) ? -1 : 0;
+                //add one to the tile's value if there is an adjacent mine
+                grid[rowOffset[j] + row][colOffest[j] + column] += (grid[rowOffset[j] + row][colOffest[j] + column] != -1) ? 1 : 0;
             }
         }
     }
@@ -261,25 +255,29 @@ public class Main implements Screen {
         int[] colOffset = {-1, 0, 1, -1, 1, -1, 0, 1};
 
 
+        //if there is a flag
         if (uncovered[y][x] == -1) {
             return;
         }
 
+        //if the tile that is clicked has at least one adjacent mine
         if (grid[y][x] != 0) {
-//            uncoveredTiles++;
-//            uncovered[y][x] = 0;
             return;
         }
 
+        // if any of the conditionals are true, then the function will not call itself again
         for (int i = 0; i < colOffset.length; i++) {
+            //make sure that the checked tiles does not extend beyond the board
             if (y + rowOffset[i] > ysize - 1 || y + rowOffset[i] < 0 || x + colOffset[i] > xsize - 1 || x + colOffset[i] < 0) {
                 continue;
             }
 
-            if (grid[y + rowOffset[i]][x + colOffset[i]] < 0 || uncovered[y + rowOffset[i]][x + colOffset[i]] == 0) {
+            //make sure that the checked tile has not already been uncovered
+            if (uncovered[y + rowOffset[i]][x + colOffset[i]] == 0) {
                 continue;
             }
 
+            //if the tile has not been uncovered yet and the tile has adjacent mines
             if (grid[y + rowOffset[i]][x + colOffset[i]] > 0 && uncovered[y + rowOffset[i]][x + colOffset[i]] != 0) {
                 uncoveredTiles++;
                 uncovered[y + rowOffset[i]][x + colOffset[i]] = 0;
