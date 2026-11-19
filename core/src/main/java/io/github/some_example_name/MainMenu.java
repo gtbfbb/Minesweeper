@@ -26,7 +26,7 @@ public class MainMenu implements Screen{
         game.batch.setProjectionMatrix(game.viewport.getCamera().combined);
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             game.setScreen(game.gameScreen);
         }
     }
